@@ -1,0 +1,49 @@
+Global Settings
+
+- blackholeDnsList = file that contains the master list of all the domains to block
+- savePath = where files go. includes scripts and ad list
+- suportScripts = list of all the scripts needed for this to work
+- logName = name of the log file... obviously
+
+Implementation
+
+# creation
+$settings = [PsCustomObject] @{
+    blackholeDnsList = "DNSBlackList.txt"
+    savePath = "C:\win-hole"
+    logName = "win-hole.log"
+    supportScripts =    "Get-WinHoleBlackList.ps1",
+                        "Load-WinHoleFunctions.ps1",
+                        "New-WinHoleDnsServer.ps1",
+                        "Set-WinHoleDnsPolicy.ps1"
+    listOfBlockLists =  'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts',
+                        'https://mirror1.malwaredomains.com/files/justdomains',
+                        'http://sysctl.org/cameleon/hosts',
+                        'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist',
+                        'https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt',
+                        'https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt',
+                        'https://hosts-file.net/ad_servers.txt'
+    hostExclusions = "localhost",
+                     "loopback",
+                     "local",
+                     "broadcasthost",
+                     "localnet",
+                     "mcastprefix",
+                     "allnodes",
+                     "allrouters",
+                     "allhosts"
+}
+
+# export
+ConvertTo-Json -InputObject $settings | Out-File "C:\Users\Administrator\Documents\Scripts\Win-hole\settings.json" -Force
+
+# import
+$settings = Get-Content "C:\Users\Administrator\Documents\Scripts\Win-hole\settings.json" | ConvertFrom-Json
+
+
+
+Directory structure
+
+savePath is the root of all files.
+savePath\bin stores the scripts and settings files
+savePath\data stores data files
