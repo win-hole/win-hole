@@ -68,11 +68,11 @@ $listOfLists | ForEach-Object {
     }
 
     # download the file
-    $result = Get-WebFile -dlUrl $_ -output "$script:dataPath\$outName"
+    $result = Get-WebFile -dlUrl $_ -output "$script:dataPath\data\$outName"
 
     if ($result)
     {
-        $adFiles += "$script:dataPath\$outName"
+        $adFiles += "$script:dataPath\data\$outName"
     }
     
     $c++
@@ -84,6 +84,17 @@ $blackList = @()
 
 foreach ($file in $adFiles)
 {
+    <#
+        Notes on the file filters:
+
+        $_ -notmatch "^\s+#.*$"                              =  Exclude comment lines with whitespace before the comment char (#)
+        $_ -notmatch "#.*$"                                  =  Exclude comment lines with no whitespace before the comment char (#)
+        $_ -ne ""                                            =  Exclude empty lines
+        ($_ -match $IPv4Pattern -or $_ -match $IPv6Pattern)  =  Include lines with a valid IPv4 or IPv6 address
+        $_ -notmatch $hostsEx                                =  Exclude lines that match the hosts exclusion list
+        $_ -replace "\s+"," "                                =  Replace all whitespace with a single space
+    #>
+    
     switch -Regex ($file)
     {
         "hosts_\d{2}.txt"  {
@@ -112,8 +123,10 @@ foreach ($file in $adFiles)
 
 
 Write-Log "Unfiltered blacklist total: $($blackList.Count)"
-#$blackList = $blackList | Where-Object {$_ -notmatch $IPv4Pattern -and $_ -notmatch $IPv6Pattern} | Sort-Object -Unique  | ForEach-Object {"*.$_`."}
+
+## filter out results that are just IP addresses. This is mainly to get rid of hosts entries of 0.0.0.0.
 $blackList = $blackList | Where-Object {$_ -notmatch $IPv4Pattern -and $_ -notmatch $IPv6Pattern} | Sort-Object -Unique
+
 Write-Log "Filtered blacklist total: $($blackList.Count)"
 
 # write results to blacklist.txt
