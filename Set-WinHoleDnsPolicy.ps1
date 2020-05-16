@@ -60,7 +60,7 @@ if ($bhlAll.Count -gt 1000)
         if ((($bhlAll.Count) - ($i * 1000)) -ge 1000)
         {
             $srtNum = $i * 1000
-            $endNum = ($i +1) * 1000 - 1
+            $endNum = ($i + 1) * 1000 - 1
             $tmp = $bhlAll[$srtNum..$endNum]
         } else {
             $srtNum = $i * 1000
@@ -79,9 +79,4 @@ if ($bhlAll.Count -gt 1000)
 
         Set-DnsBlackholePolicy -PolicyExists $PolicyExists -BlackListPolicyName $policyName -FqdnPolicyString "EQ,$($tmp -join ',')"
     }
-
 }
-
-
-
-
